@@ -1,0 +1,9 @@
+{
+  "name": "auto-header-tool",
+  "version": "1.0.0",
+  "scripts": {},
+  "dependencies": {
+    "chokidar": "^3.5.3",
+    "dayjs": "^1.11.13"
+  }
+}
