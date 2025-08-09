@@ -1,18 +1,21 @@
-import { readFileSync, writeFileSync } from "fs";
+/*
+ * @Author: zld 17875477802@163.com
+ * @Date: 2025-07-09 11:34:18
+ * @LastEditors: zld 17875477802@163.com
+ * @LastEditTime: 2025-08-09 11:11:55
+ * @FilePath: \auto-header-tool\watch-files.js
+ * @Description: 
+ * 
+ * Copyright (c) 2025 by ${git_name_email}, All Rights Reserved. 
+ */import { readFileSync, writeFileSync } from "fs";
 import chokidar from "chokidar";
 import {
   watchPatterns,
   getHeader,
   updateExistingHeader,
+  config
 } from "./watch-config.js";
 import { relative } from "path";
-
-// 配置选项
-const config = {
-  verbose: true,
-  maxConcurrent: 10,
-  editors: ["zld"],
-};
 
 let processingCount = 0;
 
@@ -42,17 +45,22 @@ async function handleFileChange(filePath) {
     let content = readFileSync(filePath, "utf8");
     let updated = false;
 
+    // 获取文件类型
+    const fileType = filePath.includes('.vue') ? '.vue' :
+      filePath.includes('.ts') ? '.ts' : '.js';
+
     // 检查是否已经有头部注释
     const hasExistingHeader =
-      content.trim().startsWith("/**") && content.includes("@LastEditTime");
+      (fileType === '.vue' ? content.trim().startsWith("<!--") : content.trim().startsWith("/**")) &&
+      content.includes("@LastEditTime");
 
     if (!hasExistingHeader) {
       // 没有头部注释，添加完整header
-      content = getHeader(config.editors) + content;
+      content = getHeader(fileType) + content;
       updated = true;
     } else {
       // 已有头部注释，更新LastEditors和LastEditTime
-      const newContent = updateExistingHeader(content, config.editors);
+      const newContent = updateExistingHeader(content, fileType);
       if (newContent !== content) {
         content = newContent;
         updated = true;
